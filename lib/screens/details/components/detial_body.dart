@@ -1,6 +1,12 @@
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/src/foundation/diagnostics.dart';
 import 'package:yoga/constants/constants.dart';
 import 'package:yoga/screens/home/home_screen_(no_need).dart';
+
+import '../../navigationbar/navigationbar_screen.dart';
 
 class DetailBody extends StatelessWidget {
   final int capacity;
@@ -14,6 +20,12 @@ class DetailBody extends StatelessWidget {
   final String time;
   final String type;
 
+  final String classId;
+  final String className;
+  final String teacher;
+  final String date;
+  final String email;
+
   const DetailBody(
       {required this.capacity,
       required this.courseId,
@@ -25,6 +37,11 @@ class DetailBody extends StatelessWidget {
       required this.price,
       required this.time,
       required this.type,
+      required this.classId,
+      required this.className,
+      required this.teacher,
+      required this.date,
+      required this.email,
       Key? key})
       : super(key: key);
 
@@ -40,10 +57,7 @@ class DetailBody extends StatelessWidget {
           children: [
             Text(
               courseName,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold
-              ),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
             Text(
@@ -59,11 +73,118 @@ class DetailBody extends StatelessWidget {
                 Column(
                   children: [
                     Text(
+                      "Class Name ",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.meeting_room_rounded,
+                          size: 18,
+                        ),
+                        Text(
+                          " $className",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ],
+            ),
+            const Divider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      "Date ",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.date_range_rounded,
+                          size: 18,
+                        ),
+                        Text(
+                          " $date",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ],
+            ),
+            const Divider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      "Teacher ",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.person_2_rounded,
+                          size: 18,
+                        ),
+                        Text(
+                          " $teacher",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ],
+            ),
+            const Divider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    Text(
                       "Duration ",
                       style: TextStyle(
                         fontSize: 20,
                         color: Colors.grey[600],
-                        
                       ),
                     ),
                   ],
@@ -184,21 +305,57 @@ class DetailBody extends StatelessWidget {
             ),
             const SizedBox(height: 15),
             InkWell(
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomeScreen(),
-                ),
-              ),
+              onTap: () {
+                // var rng = Random();
+                // var doc;
+                // for (var i = 0; i < 10; i++) {
+                //   doc = rng.nextInt(1000);
+                //   print(doc);
+                // }
+                var number = "";
+                var randomnumber = Random();
+                //chnage i < 15 on your digits need
+                for (var i = 0; i < 15; i++) {
+                  number = number + randomnumber.nextInt(9).toString();
+                }
+                print(number);
+
+                final book = <String, dynamic>{
+                  "bookId": int.parse(number),
+                  "classId": classId,
+                  "email": email
+                };
+
+                FirebaseFirestore.instance
+                    .collection("yoga_book")
+                    .doc(number.toString())
+                    .set(book)
+                    .then((value) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NavigationBarScreen(),
+                    ),
+                  );
+                }).onError((e, _) {
+                  print("Error writing document: $e");
+                });
+              },
+              // onTap: () => Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => HomeScreen(),
+              //   ),
+              // ),
               child: Material(
                   elevation: 10.0,
                   shadowColor: darkYellow,
                   color: darkYellow,
                   borderRadius: BorderRadius.circular(30.0),
-                  child: Container(
+                  child: SizedBox(
                     width: size.width,
                     height: size.width * 0.15,
-                    child: Center(
+                    child: const Center(
                       child: Text(
                         'Book',
                         style: TextStyle(

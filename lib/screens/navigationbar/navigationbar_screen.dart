@@ -49,7 +49,7 @@ class _NavigationBarScreenState extends State<NavigationBarScreen> {
             color: selsctedIconIndex == 0 ? white : black,
           ),
           Icon(
-            Icons.shopping_cart_checkout_outlined,
+            Icons.book_rounded,
             size: 30,
             color: selsctedIconIndex == 1 ? white : black,
           ),

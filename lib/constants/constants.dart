@@ -15,7 +15,8 @@ const double appPadding = 20.0;
 
 // Day of week
 
-final List<String> daysOfWeek = [
+final List<String> daysOfWeek = [  
+  'All',
   'Monday',
   'Tuesday',
   'Wednesday',

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:yoga/constants/constants.dart';
+import 'package:yoga/screens/class/class_screen.dart';
 import 'package:yoga/screens/details/details_screen.dart';
 
 class CoursesScreen extends StatefulWidget {
@@ -11,38 +12,26 @@ class CoursesScreen extends StatefulWidget {
 }
 
 class _CoursesScreenState extends State<CoursesScreen> {
-  late List documents;
+  late var documents = [];
 
-  String? selectedDay;
+  String? selectedDay = "All";
 
-  TimeOfDay? startTime;
-  TimeOfDay? endTime;
+  // TimeOfDay? startTime;
+  TimeOfDay? selectTime;
+  String selectedT = "";
 
-  // Function to pick start time
-  Future<void> pickStartTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: startTime ?? TimeOfDay.now(),
-    );
-    if (picked != null && picked != startTime) {
-      // setState(() {
-      startTime = picked;
-      // });
-    }
-  }
-
-  // Function to pick end time
-  Future<void> pickEndTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: endTime ?? TimeOfDay.now(),
-    );
-    if (picked != null && picked != endTime) {
-      // setState(() {
-      endTime = picked;
-      // });
-    }
-  }
+  // // Function to pick start time
+  // Future<void> pickStartTime(BuildContext context) async {
+  //   final TimeOfDay? picked = await showTimePicker(
+  //     context: context,
+  //     initialTime: startTime ?? TimeOfDay.now(),
+  //   );
+  //   if (picked != null && picked != startTime) {
+  //     // setState(() {
+  //     startTime = picked;
+  //     // });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -61,11 +50,19 @@ class _CoursesScreenState extends State<CoursesScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DetailsScreen(
-                  detailList: document,
+                builder: (context) => ClassScreen(
+                  courseDetail: document,
                 ),
               ),
             );
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => DetailsScreen(
+            //       detailList: document,
+            //     ),
+            //   ),
+            // );
           },
           child: Card(
             elevation: 4,
@@ -133,6 +130,38 @@ class _CoursesScreenState extends State<CoursesScreen> {
                         Row(
                           children: [
                             const Icon(
+                              Icons.person_3_rounded,
+                              size: 15,
+                            ),
+                            Text(
+                              " ${document['capacity']} Person(s)",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 3),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.currency_exchange_rounded,
+                              size: 15,
+                            ),
+                            Text(
+                              " \$${document['price']}",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 3),
+                        Row(
+                          children: [
+                            const Icon(
                               Icons.calendar_month_outlined,
                               size: 15,
                             ),
@@ -173,6 +202,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                 .collection('yoga_courses')
                 .snapshots(),
             builder: (context, snapshot) {
+              // documents = snapshot.data!.docs;
               if (!snapshot.hasData)
                 // ignore: curly_braces_in_flow_control_structures
                 return const Center(child: Text("Loading...")
@@ -195,39 +225,137 @@ class _CoursesScreenState extends State<CoursesScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'Courses',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.5,
-                                color: darkYellow,
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                'Courses',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.5,
+                                  color: darkYellow,
+                                ),
                               ),
                             ),
+                            // Container(
+                            //     child: DropdownButton<String>(
+                            //   hint: const Text(
+                            //     "Select a Day",
+                            //     style: TextStyle(
+                            //       color: darkYellow,
+                            //     ),
+                            //   ),
+                            //   value: selectedDay,
+                            //   onChanged: (String? newValue) {
+                            //     setState(() {
+                            //       print("SELECTED DAY >> $selectedDay");
+                            //       selectedDay = newValue;
+                            //       documents = snapshot.data!.docs;
+                            //       if (selectedDay != "") {
+                            //         documents = documents.where((element) {
+                            //           return element
+                            //               .get('dayOfWeek')
+                            //               .toString()
+                            //               .toLowerCase()
+                            //               .contains(selectedDay
+                            //                   .toString()
+                            //                   .toLowerCase());
+                            //         }).toList();
+
+                            //         documents = documents.where((element) {
+                            //           return element
+                            //               .get('time')
+                            //               .toString()
+                            //               .toLowerCase()
+                            //               .contains(
+                            //                   "21:00".toString().toLowerCase());
+                            //         }).toList();
+                            //       }
+                            //     });
+                            //   },
+                            //   items: daysOfWeek.map((String day) {
+                            //     return DropdownMenuItem<String>(
+                            //       value: day,
+                            //       child: Text(day),
+                            //     );
+                            //   }).toList(),
+                            // )),
+                            Container()
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Start Time Picker
                             Container(
                                 child: DropdownButton<String>(
                               hint: const Text(
                                 "Select a Day",
                                 style: TextStyle(
-                                  color: darkYellow,
+                                  color: Colors.black,
                                 ),
                               ),
                               value: selectedDay,
+                              style: const TextStyle(color: Colors.black),
                               onChanged: (String? newValue) {
                                 setState(() {
                                   print("SELECTED DAY >> $selectedDay");
                                   selectedDay = newValue;
-                                  documents = snapshot.data!.docs;
-                                  if (selectedDay != "") {
-                                    documents = documents.where((element) {
-                                      return element
-                                          .get('dayOfWeek')
-                                          .toString()
-                                          .toLowerCase()
-                                          .contains(selectedDay
-                                              .toString()
-                                              .toLowerCase());
-                                    }).toList();
+                                  // documents = snapshot.data!.docs;
+                                  // if (selectedDay != "") {
+                                  //   documents = documents.where((element) {
+                                  //     return element
+                                  //         .get('dayOfWeek')
+                                  //         .toString()
+                                  //         .toLowerCase()
+                                  //         .contains(selectedDay
+                                  //             .toString()
+                                  //             .toLowerCase());
+                                  //   }).toList();
+                                  // }
+                                  if (selectedT != "" && selectedDay != "All") {
+                                    // documents = documents.where((element) {
+                                    //   return element
+                                    //       .get('time')
+                                    //       .toString()
+                                    //       .toLowerCase()
+                                    //       .contains(
+                                    //           selectedT.toLowerCase());
+                                    // }).toList();
+                                    FirebaseFirestore.instance
+                                        .collection("yoga_courses")
+                                        .where('dayOfWeek',
+                                            isEqualTo: selectedDay)
+                                        .where('time', isEqualTo: selectedT)
+                                        .get()
+                                        .then((querySnapshot) {
+                                      setState(() {
+                                        documents = querySnapshot.docs;
+                                      });
+                                    });
+                                  } else if (selectedT == "" &&
+                                      selectedDay == "All") {
+                                    FirebaseFirestore.instance
+                                        .collection("yoga_courses")
+                                        .where('dayOfWeek',
+                                            isEqualTo: selectedDay)
+                                        .get()
+                                        .then((querySnapshot) {
+                                      setState(() {
+                                        documents = querySnapshot.docs;
+                                      });
+                                    });
+                                  } else {
+                                    FirebaseFirestore.instance
+                                        .collection("yoga_courses")
+                                        .where('dayOfWeek',
+                                            isEqualTo: selectedDay)
+                                        .get()
+                                        .then((querySnapshot) {
+                                      setState(() {
+                                        documents = querySnapshot.docs;
+                                      });
+                                    });
                                   }
                                 });
                               },
@@ -238,89 +366,209 @@ class _CoursesScreenState extends State<CoursesScreen> {
                                 );
                               }).toList(),
                             )),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            // Start Time Picker
-                            GestureDetector(
-                              onTap: () => pickStartTime(context),
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: const BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color:
-                                          Colors.grey, // Color for top border
-                                      width:
-                                          0.0, // Setting width to 0 makes the top border invisible
-                                    ),
-                                  ),
-                                  //  Border.all(color: Colors.grey),
-                                  // borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.timer_outlined,
-                                      size: 20,
-                                      color: darkYellow,
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      startTime != null
-                                          ? startTime!.format(context)
-                                          : 'Start Time',
-                                      style: const TextStyle(
-                                          fontSize: 16, color: darkYellow),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                            // GestureDetector(
+                            //   onTap: () => pickStartTime(context),
+                            //   child: Container(
+                            //     padding: const EdgeInsets.all(6),
+                            //     decoration: const BoxDecoration(
+                            //       border: Border(
+                            //         bottom: BorderSide(
+                            //           color:
+                            //               Colors.grey, // Color for top border
+                            //           width:
+                            //               0.0, // Setting width to 0 makes the top border invisible
+                            //         ),
+                            //       ),
+                            //       //  Border.all(color: Colors.grey),
+                            //       // borderRadius: BorderRadius.circular(8),
+                            //     ),
+                            //     child: Row(
+                            //       children: [
+                            //         const Icon(
+                            //           Icons.timer_outlined,
+                            //           size: 20,
+                            //           color: darkYellow,
+                            //         ),
+                            //         const SizedBox(
+                            //           width: 10,
+                            //         ),
+                            //         Text(
+                            //           startTime != null
+                            //               ? startTime!.format(context)
+                            //               : 'Start Time',
+                            //           style: const TextStyle(
+                            //               fontSize: 16, color: darkYellow),
+                            //         ),
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
 
                             // End Time Picker
-                            GestureDetector(
-                              onTap: () => pickEndTime(context),
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: const BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color:
-                                          Colors.grey, // Color for top border
-                                      width:
-                                          0.0, // Setting width to 0 makes the top border invisible
-                                    ),
-                                  ),
-                                  //  Border.all(color: Colors.grey),
-                                  // borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
+                            Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    const Icon(
-                                      Icons.timer_outlined,
-                                      size: 20,
-                                      color: darkYellow,
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      endTime != null
-                                          ? endTime!.format(context)
-                                          : 'End Time',
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: darkYellow,
+                                    GestureDetector(
+                                      onTap: () async {
+                                        var picked = await showTimePicker(
+                                          context: context,
+                                          initialTime:
+                                              selectTime ?? TimeOfDay.now(),
+                                          builder: (BuildContext context,
+                                              Widget? child) {
+                                            return MediaQuery(
+                                              data: MediaQuery.of(context)
+                                                  .copyWith(
+                                                      alwaysUse24HourFormat:
+                                                          true),
+                                              child: child ?? Container(),
+                                            );
+                                          },
+                                        );
+                                        if (picked != null &&
+                                            picked != selectTime) {
+                                          setState(() {
+                                            selectTime = picked;
+                                            selectedT = selectTime
+                                                .toString()
+                                                .substring(
+                                                    10,
+                                                    selectTime
+                                                            .toString()
+                                                            .length -
+                                                        1);
+
+                                            setState(() {
+                                              print(
+                                                  "SELECTED TIME >> $selectedT");
+                                              // selectedDay = newValue;
+                                              // documents = snapshot.data!.docs;
+                                              if (selectedDay != "All") {
+                                                // documents = documents.where((element) {
+                                                //   return element
+                                                //       .get('time')
+                                                //       .toString()
+                                                //       .toLowerCase()
+                                                //       .contains(
+                                                //           selectedT.toLowerCase());
+                                                // }).toList();
+                                                FirebaseFirestore.instance
+                                                    .collection("yoga_courses")
+                                                    .where('dayOfWeek',
+                                                        isEqualTo: selectedDay)
+                                                    .where('time',
+                                                        isEqualTo: selectedT)
+                                                    .get()
+                                                    .then((querySnapshot) {
+                                                  setState(() {
+                                                    documents =
+                                                        querySnapshot.docs;
+                                                  });
+                                                });
+                                              } else {
+                                                FirebaseFirestore.instance
+                                                    .collection("yoga_courses")
+                                                    .where('time',
+                                                        isEqualTo: selectedT)
+                                                    .get()
+                                                    .then((querySnapshot) {
+                                                  setState(() {
+                                                    documents =
+                                                        querySnapshot.docs;
+                                                  });
+                                                });
+                                              }
+                                            });
+                                          });
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(6),
+                                        decoration: const BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
+                                              color: Colors
+                                                  .grey, // Color for top border
+                                              width:
+                                                  0.0, // Setting width to 0 makes the top border invisible
+                                            ),
+                                          ),
+                                          //  Border.all(color: Colors.grey),
+                                          // borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.timer_outlined,
+                                              size: 20,
+                                              color: Colors.black,
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text(
+                                              selectTime != null
+                                                  ? selectTime!.format(context)
+                                                  : 'Select Time',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
+                                    ),
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                selectedT = "";
+                                                selectTime = null;
+                                                if (selectedDay != "All") {
+                                                  FirebaseFirestore.instance
+                                                      .collection(
+                                                          "yoga_courses")
+                                                      .where('dayOfWeek',
+                                                          isEqualTo:
+                                                              selectedDay)
+                                                      .get()
+                                                      .then((querySnapshot) {
+                                                    setState(() {
+                                                      documents =
+                                                          querySnapshot.docs;
+                                                    });
+                                                  });
+                                                } else {
+                                                  FirebaseFirestore.instance
+                                                      .collection(
+                                                          "yoga_courses")
+                                                      .get()
+                                                      .then((querySnapshot) {
+                                                    setState(() {
+                                                      documents =
+                                                          querySnapshot.docs;
+                                                    });
+                                                  });
+                                                }
+                                              });
+                                            },
+                                            child: const Icon(
+                                              Icons.close_rounded,
+                                              size: 23,
+                                            )),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ),
+                              ],
                             ),
                           ],
                         )
@@ -328,14 +576,23 @@ class _CoursesScreenState extends State<CoursesScreen> {
                     ),
                   ),
                   Expanded(
-                    child: ListView.builder(
-                      // itemExtent: 80.0,
-                      itemCount: documents.isEmpty
-                          ? snapshot.data?.docs.length
-                          : documents.length,
-                      itemBuilder: (context, index) =>
-                          buildListItem(context, snapshot.data!.docs[index]),
-                    ),
+                    child: (documents.isEmpty &&
+                            selectedDay != "All" &&
+                            snapshot.data!.docs.isNotEmpty)
+                        ? const Center(
+                            child: Text("No Data"),
+                          )
+                        : ListView.builder(
+                            // itemExtent: 80.0,
+                            itemCount: documents.isEmpty
+                                ? snapshot.data!.docs.length
+                                : documents.length,
+                            itemBuilder: (context, index) => buildListItem(
+                                context,
+                                documents.isEmpty
+                                    ? snapshot.data!.docs[index]
+                                    : documents[index]),
+                          ),
                   ),
                   const SizedBox(
                     height: 15,

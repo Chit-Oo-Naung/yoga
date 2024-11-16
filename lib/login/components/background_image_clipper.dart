@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:yoga/constants/constants.dart';
-import 'package:yoga/screens/home/components/curve_clipper.dart';
 
-
+import '../../constants/constants.dart';
+import '../../screens/home/components/curve_clipper.dart';
 
 class BackgroundImage extends StatelessWidget {
   @override
@@ -13,7 +12,7 @@ class BackgroundImage extends StatelessWidget {
     return ClipPath(
       clipper: CurveClipper(),
       child: Container(
-        height: size.height * 0.45,
+        height: size.height * 0.55,
         color: blueGrey.withOpacity(0.8),
         child: const Padding(
           padding: EdgeInsets.symmetric(
