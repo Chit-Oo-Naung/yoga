@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../constants/constants.dart';
-import '../../screens/home/components/curve_clipper.dart';
+import '../../../constants/constants.dart';
+import '../../home/components/curve_clipper.dart';
 
 class BackgroundImage extends StatelessWidget {
   @override

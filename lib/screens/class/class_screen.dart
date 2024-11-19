@@ -22,18 +22,18 @@ class _ClassScreenState extends State<ClassScreen> {
   void initState() {
     course = widget.courseDetail;
     courseName = course["courseName"];
-    getEmail();
+    // getEmail();
     super.initState();
   }
 
-  var email = "";
+  // var email = "";
 
-  getEmail() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+  // getEmail() async {
+  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    email = prefs.getString('email') ?? "";
-    print("Email>> $email");
-  }
+  //   email = prefs.getString('email') ?? "";
+  //   print("Email>> $email");
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +94,7 @@ class _ClassScreenState extends State<ClassScreen> {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
+                            color: black
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -104,7 +105,7 @@ class _ClassScreenState extends State<ClassScreen> {
                                 document['additionalComments'],
                                 style: const TextStyle(
                                   fontSize: 12,
-                                  color: Colors.black,
+                                  color: black,
                                 ),
                               ),
                         const SizedBox(height: 3),
@@ -113,13 +114,13 @@ class _ClassScreenState extends State<ClassScreen> {
                             const Icon(
                               Icons.meeting_room_rounded,
                               size: 15,
-                              color: Colors.black,
+                              color: black,
                             ),
                             Text(
                               " ${document['className']}",
                               style: const TextStyle(
                                 fontSize: 16,
-                                color: Colors.black,
+                                color: black,
                               ),
                             ),
                           ],
@@ -130,13 +131,13 @@ class _ClassScreenState extends State<ClassScreen> {
                             const Icon(
                               Icons.date_range_rounded,
                               size: 15,
-                              color: Colors.black,
+                              color: black,
                             ),
                             Text(
                               " ${document['date']}",
                               style: const TextStyle(
                                 fontSize: 16,
-                                color: Colors.black,
+                                color: black,
                               ),
                             ),
                           ],
@@ -147,13 +148,13 @@ class _ClassScreenState extends State<ClassScreen> {
                             const Icon(
                               Icons.person_2_rounded,
                               size: 15,
-                              color: Colors.black,
+                              color: black,
                             ),
                             Text(
                               " ${document['teacher']}",
                               style: const TextStyle(
                                 fontSize: 16,
-                                color: Colors.black,
+                                color: black,
                               ),
                             ),
                           ],
@@ -200,7 +201,7 @@ class _ClassScreenState extends State<ClassScreen> {
           appBar: AppBar(
             backgroundColor: darkYellow,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              icon: const Icon(Icons.arrow_back, color: white),
               onPressed: () => Navigator.of(context).pop(),
             ),
             title: Text(
@@ -209,7 +210,7 @@ class _ClassScreenState extends State<ClassScreen> {
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.5,
-                color: Colors.black,
+                color: white,
               ),
             ),
           ),
@@ -235,7 +236,7 @@ class _ClassScreenState extends State<ClassScreen> {
                   Expanded(
                     child: (snapshot.data!.docs.isEmpty)
                         ? const Center(
-                            child: Text("No Data"),
+                            child: Text("NO DATA"),
                           )
                         : ListView.builder(
                             // itemExtent: 80.0,
@@ -268,7 +269,7 @@ class _ClassScreenState extends State<ClassScreen> {
               //       //         //     Expanded(
               //       //         //       child: (snapshot.data!.docs.isEmpty)
               //       //         //           ? const Center(
-              //       //         //               child: Text("No Data"),
+              //       //         //               child: Text("NO DATA"),
               //       //         //             )
               //       //         //           : ListView.builder(
               //       //         //               // itemExtent: 80.0,

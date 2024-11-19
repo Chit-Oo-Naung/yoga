@@ -8,12 +8,17 @@ import 'package:yoga/screens/details/components/circle_button.dart';
 import 'package:yoga/screens/details/components/detial_body.dart';
 import 'package:yoga/models/course.dart';
 
+import '../login/components/curve_clipper.dart';
+
 class DetailsScreen extends StatefulWidget {
   final DocumentSnapshot courseDetail;
   final DocumentSnapshot classDetail;
   final String email;
   const DetailsScreen(
-      {super.key, required this.courseDetail, required this.classDetail, required this.email});
+      {super.key,
+      required this.courseDetail,
+      required this.classDetail,
+      required this.email});
 
   @override
   State<DetailsScreen> createState() => _DetailsScreenState();
@@ -39,6 +44,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -47,24 +53,23 @@ class _DetailsScreenState extends State<DetailsScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                BackgroundImage(),
+                BackgroundImage(img: courseDtl["imageUri"].toString()),
                 DetailBody(
-                  capacity: int.parse(courseDtl["capacity"].toString()),
-                  courseId: int.parse(courseDtl["courseId"].toString()),
-                  courseName: courseDtl["courseName"].toString(),
-                  dayOfWeek: courseDtl["dayOfWeek"].toString(),
-                  description: courseDtl["description"],
-                  duration: double.parse(courseDtl["duration"].toString()),
-                  id: int.parse(courseDtl["id"].toString()),
-                  price: double.parse(courseDtl["price"]),
-                  time: courseDtl["time"],
-                  type: courseDtl["type"],
-                  classId: classDtl["classId"].toString(),
-                  className: classDtl["className"],
-                  teacher: classDtl["teacher"],
-                  date: classDtl["date"],
-                  email: widget.email
-                ),
+                    capacity: int.parse(courseDtl["capacity"].toString()),
+                    courseId: int.parse(courseDtl["courseId"].toString()),
+                    courseName: courseDtl["courseName"].toString(),
+                    dayOfWeek: courseDtl["dayOfWeek"].toString(),
+                    description: courseDtl["description"],
+                    duration: double.parse(courseDtl["duration"].toString()),
+                    id: int.parse(courseDtl["id"].toString()),
+                    price: double.parse(courseDtl["price"]),
+                    time: courseDtl["time"],
+                    type: courseDtl["type"],
+                    classId: classDtl["classId"].toString(),
+                    className: classDtl["className"],
+                    teacher: classDtl["teacher"],
+                    date: classDtl["date"],
+                    email: widget.email),
               ],
             ),
             CircleButton(),

@@ -42,7 +42,7 @@ class _BookingScreenState extends State<BookingScreen> {
 
   bool loading = true;
 
-  var email = "";
+  // var email = "";
 
   @override
   void initState() {
@@ -50,11 +50,20 @@ class _BookingScreenState extends State<BookingScreen> {
     super.initState();
   }
 
-  getBookedListData() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+  @override
+  void dispose() {
+    // Dispose the controller when the widget is removed from the widget tree
+    super.dispose();
+  }
 
-    email = prefs.getString('email') ?? "";
-    bookListDtl = [];
+  getBookedListData() async {
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // email = prefs.getString('email') ?? "";
+    setState(() {
+      bookListDtl = [];
+    });
+
     FirebaseFirestore.instance
         .collection('yoga_book')
         .where('email', isEqualTo: email)
@@ -68,40 +77,44 @@ class _BookingScreenState extends State<BookingScreen> {
         });
       }
       for (var i = 0; i < querySnapshot.docs.length; i++) {
-        print("BOOK LIST >> ${querySnapshot.docs[i]["classId"]}");
+        // print("BOOK LIST >> ${querySnapshot.docs[i]["classId"]}");
 
         await FirebaseFirestore.instance
-            .collection('yoga_class_instances')
+            .collection('yoga_class_instances')            
             .where('classId',
                 isEqualTo: int.parse(querySnapshot.docs[i]["classId"]))
             .get()
             .then((querySnapshotClass) {
-          setState(() {
+          // setState(() {
+          // bookListDtl = querySnapshotClass.docs;
+          print("BOOK LIST Lgh >> ${querySnapshotClass.docs.length}");
+          for (var j = 0; j < querySnapshotClass.docs.length; j++) {
+            // print(
+            //     "BOOK LIST 2 >> ${querySnapshotClass.docs[j]["className"]}");
+            print("BOOK LIST 1 >> ${querySnapshot.docs[i]["bookId"]}");
             // bookListDtl = querySnapshotClass.docs;
-            print("BOOK LIST 1 >> ${querySnapshotClass.docs.length}");
-            for (var j = 0; j < querySnapshotClass.docs.length; j++) {
-              print(
-                  "BOOK LIST 2 >> ${querySnapshotClass.docs[j]["className"]}");
-
-              // bookListDtl = querySnapshotClass.docs;
-              setState(() {
-                bookListDtl.add({
-                  'bookId': querySnapshot.docs[i]["bookId"],
-                  'classId': querySnapshot.docs[i]["classId"],
-                  'email': querySnapshot.docs[i]["email"],
-                  'additionalComments': querySnapshotClass.docs[j]
-                      ["additionalComments"],
-                  'className': querySnapshotClass.docs[j]["className"],
-                  'courseId': querySnapshotClass.docs[j]["courseId"],
-                  'courseName': querySnapshotClass.docs[j]["courseName"],
-                  'date': querySnapshotClass.docs[j]["date"],
-                  'id': querySnapshotClass.docs[j]["id"],
-                  'teacher': querySnapshotClass.docs[j]["teacher"],
-                });
-                loading = false;
+            setState(() {
+              bookListDtl.add({
+                'bookId': querySnapshot.docs[i]["bookId"],
+                'classId': querySnapshot.docs[i]["classId"],
+                'email': querySnapshot.docs[i]["email"],
+                'additionalComments': querySnapshotClass.docs[j]
+                    ["additionalComments"],
+                'className': querySnapshotClass.docs[j]["className"],
+                'courseId': querySnapshotClass.docs[j]["courseId"],
+                'courseName': querySnapshotClass.docs[j]["courseName"],
+                'date': querySnapshotClass.docs[j]["date"],
+                'id': querySnapshotClass.docs[j]["id"],
+                'teacher': querySnapshotClass.docs[j]["teacher"],
               });
-            }
-          });
+              if (i == querySnapshot.docs.length - 1) {
+                setState(() {
+                  loading = false;
+                });
+              }
+            });
+          }
+          // });
         });
       }
     });
@@ -122,20 +135,57 @@ class _BookingScreenState extends State<BookingScreen> {
         subtitle: Text(
             '${document[i]['className']} ~ ${document[i]['date']}'), //Text(yogaClass.time),
         trailing: ElevatedButton(
-          onPressed: () {
-            FirebaseFirestore.instance
-                .collection("yoga_book")
-                .doc(document[i]['bookId'].toString())
-                .delete()
-                .then(
-              (doc) {
-                print(
-                    "Document deleted >>> ${document[i]['bookId'].toString()}");
-                Future.delayed(const Duration(seconds: 2), () {
-                  getBookedListData();
-                });
+          onPressed: () async {
+            final result = await showDialog<bool>(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text(
+                    'Cancel Booking',
+                    // style: TextStyle(color: Colors.red),
+                  ),
+                  content: Text(
+                      "Are you sure you want to cancel this '${document[i]['courseName']} | ${document[i]['className']} ~ ${document[i]['date']}'?"),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(false); // Return "No"
+                      },
+                      child: const Text(
+                        'No',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        await FirebaseFirestore.instance
+                            .collection("yoga_book")
+                            .doc(document[i]['bookId'].toString())
+                            .delete()
+                            .whenComplete(() {
+                          print(
+                              "Document deleted >>> ${document[i]['bookId'].toString()}");
+                          Navigator.of(context).pop(true); // Return "Yes"
+                          Future.delayed(const Duration(seconds: 1), () {
+                            getBookedListData();
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Canceled Successfully!')),
+                          );
+                        }).then(
+                          (doc) {},
+                          onError: (e) => print("Error updating document $e"),
+                        );
+                      },
+                      child: const Text(
+                        'Yes',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  ],
+                );
               },
-              onError: (e) => print("Error updating document $e"),
             );
           }, //toggleBooking(index),
           style: ElevatedButton.styleFrom(
@@ -189,9 +239,9 @@ class _BookingScreenState extends State<BookingScreen> {
                               const Padding(
                                 padding: EdgeInsets.only(top: 8.0),
                                 child: Text(
-                                  'Booked List',
+                                  'BOOKED LIST',
                                   style: TextStyle(
-                                    fontSize: 24,
+                                    fontSize: 23,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: 1.5,
                                     color: darkYellow,
@@ -218,7 +268,7 @@ class _BookingScreenState extends State<BookingScreen> {
                     Expanded(
                       child: bookListDtl.isEmpty
                           ? const Center(
-                              child: Text("No Data"),
+                              child: Text("NO DATA"),
                             )
                           : ListView.builder(
                               // itemExtent: 80.0,
@@ -282,7 +332,7 @@ class _BookingScreenState extends State<BookingScreen> {
           //           Expanded(
           //             child: snapshot.data!.docs.isEmpty
           //                 ? const Center(
-          //                     child: Text("No Data"),
+          //                     child: Text("NO DATA"),
           //                   )
           //                 : ListView.builder(
           //                     // itemExtent: 80.0,

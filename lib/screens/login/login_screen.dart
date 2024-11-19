@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../screens/details/components/background_image_clipper.dart';
+import '../details/components/background_image_clipper.dart';
 import 'components/login_credentials.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -20,7 +20,9 @@ class _LoginScreenState extends State<LoginScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                BackgroundImage(),
+                const BackgroundImage(
+                  img: 'assets/images/yoga.png',
+                ),
                 LoginCredentials(),
               ],
             ),

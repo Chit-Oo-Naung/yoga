@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:yoga/login/login_screen.dart';
+import 'package:yoga/screens/login/login_screen.dart';
 import 'package:yoga/screens/navigationbar/navigationbar_screen.dart';
 import 'package:yoga/screens/splash_screen.dart';
 

@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yoga/screens/cart/cart_screen.dart';
 import 'package:yoga/constants/constants.dart';
 import 'package:yoga/screens/class/class_screen.dart';
 import 'package:yoga/screens/details/details_screen.dart';
@@ -19,6 +23,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
   // TimeOfDay? startTime;
   TimeOfDay? selectTime;
   String selectedT = "";
+  var cartCount = 0;
 
   // // Function to pick start time
   // Future<void> pickStartTime(BuildContext context) async {
@@ -32,6 +37,24 @@ class _CoursesScreenState extends State<CoursesScreen> {
   //     // });
   //   }
   // }
+
+  @override
+  void initState() {
+    getCart();
+    super.initState();
+  }
+
+  getCart() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    List lst = [];
+    var crtLst = prefs.getString('cart_list') ?? "";
+    if (crtLst != "") {
+      lst = json.decode(crtLst);
+      cartCount = lst.length;
+    }
+
+    print("LIST COUNT >>> ${lst.length}");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,10 +102,16 @@ class _CoursesScreenState extends State<CoursesScreen> {
                     height: 100,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      image: const DecorationImage(
-                        image: AssetImage('assets/images/yoga.png'),
-                        fit: BoxFit.cover,
-                      ),
+                      image: document["imageUri"] != ""
+                          ? DecorationImage(
+                              image: NetworkImage('${document["imageUri"]}'),
+                              // AssetImage('assets/images/yoga.png'),
+                              fit: BoxFit.cover,
+                            )
+                          : const DecorationImage(
+                              image: AssetImage('assets/images/yoga.png'),
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
                   const SizedBox(width: 16), // Space between image and text
@@ -150,7 +179,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                               size: 15,
                             ),
                             Text(
-                              " \$${document['price']}",
+                              " €${document['price']}",
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey[600],
@@ -228,7 +257,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                             const Padding(
                               padding: EdgeInsets.only(top: 8.0),
                               child: Text(
-                                'Courses',
+                                'COURSES',
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w800,
@@ -280,7 +309,48 @@ class _CoursesScreenState extends State<CoursesScreen> {
                             //     );
                             //   }).toList(),
                             // )),
-                            Container()
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CartScreen(),
+                                  ),
+                                );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 16.0),
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.shopping_cart,
+                                      size: 32,
+                                      color: darkYellow,
+                                    ),
+                                    if (cartCount > 0)
+                                      Positioned(
+                                        right: 0,
+                                        top: 0,
+                                        child: Container(
+                                          padding: EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Text(
+                                            cartCount > 0 ? '$cartCount' : '',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            )
                           ],
                         ),
                         Row(
@@ -580,7 +650,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                             selectedDay != "All" &&
                             snapshot.data!.docs.isNotEmpty)
                         ? const Center(
-                            child: Text("No Data"),
+                            child: Text("NO DATA"),
                           )
                         : ListView.builder(
                             // itemExtent: 80.0,

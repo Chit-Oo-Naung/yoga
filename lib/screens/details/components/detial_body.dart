@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/diagnostics.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yoga/constants/constants.dart';
 import 'package:yoga/screens/home/home_screen_(no_need).dart';
 
@@ -294,7 +296,7 @@ class DetailBody extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  " \$$price",
+                  " €$price",
                   style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
@@ -305,41 +307,76 @@ class DetailBody extends StatelessWidget {
             ),
             const SizedBox(height: 15),
             InkWell(
-              onTap: () {
-                // var rng = Random();
-                // var doc;
-                // for (var i = 0; i < 10; i++) {
-                //   doc = rng.nextInt(1000);
-                //   print(doc);
-                // }
-                var number = "";
-                var randomnumber = Random();
-                //chnage i < 15 on your digits need
-                for (var i = 0; i < 15; i++) {
-                  number = number + randomnumber.nextInt(9).toString();
+              onTap: () async {
+                final SharedPreferences prefs =
+                    await SharedPreferences.getInstance();
+
+                // List lst = json.decode(prefs.getString("cart_list") ?? "");
+                List lst = [];
+                var crtLst = prefs.getString('cart_list') ?? "";
+                if (crtLst != "") {
+                  lst = json.decode(crtLst);
                 }
-                print(number);
+                // var lst =
+                //     json.decode(prefs.getString("cart_list")) ?? "";
 
-                final book = <String, dynamic>{
-                  "bookId": int.parse(number),
-                  "classId": classId,
-                  "email": email
-                };
-
-                FirebaseFirestore.instance
-                    .collection("yoga_book")
-                    .doc(number.toString())
-                    .set(book)
-                    .then((value) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NavigationBarScreen(),
-                    ),
-                  );
-                }).onError((e, _) {
-                  print("Error writing document: $e");
+                lst.add({
+                  'classId': classId,
+                  'email': email,
+                  'additionalComments': description,
+                  'className': className,
+                  'courseId': courseId,
+                  'courseName': courseName,
+                  'date': date,
+                  'id': id,
+                  'teacher': teacher,
                 });
+
+                // var list = [
+                //   {
+                //     'classId': classId,
+                //     'email': email,
+                //     'additionalComments': description,
+                //     'className': className,
+                //     'courseId': courseId,
+                //     'courseName': courseName,
+                //     'date': date,
+                //     'id': id,
+                //     'teacher': teacher,
+                //   }
+                // ];
+
+                prefs.setString("cart_list", json.encode(lst));
+
+                ///////
+                // var number = "";
+                // var randomnumber = Random();
+                // //can change i < 15 on if digits need
+                // for (var i = 0; i < 15; i++) {
+                //   number = number + randomnumber.nextInt(9).toString();
+                // }
+                // print(number);
+
+                // final book = <String, dynamic>{
+                //   "bookId": int.parse(number),
+                //   "classId": classId,
+                //   "email": email
+                // };
+
+                // FirebaseFirestore.instance
+                //     .collection("yoga_book")
+                //     .doc(number.toString())
+                //     .set(book)
+                //     .then((value) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NavigationBarScreen(),
+                  ),
+                );
+                // }).onError((e, _) {
+                //   print("Error writing document: $e");
+                // });
               },
               // onTap: () => Navigator.push(
               //   context,
@@ -357,7 +394,7 @@ class DetailBody extends StatelessWidget {
                     height: size.width * 0.15,
                     child: const Center(
                       child: Text(
-                        'Book',
+                        'ADD TO CART',
                         style: TextStyle(
                           color: black,
                           fontSize: 18,

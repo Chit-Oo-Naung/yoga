@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yoga/screens/navigationbar/navigationbar_screen.dart';
 
-import '../../constants/constants.dart';
+import '../../../constants/constants.dart';
 
 class LoginCredentials extends StatelessWidget {
   @override

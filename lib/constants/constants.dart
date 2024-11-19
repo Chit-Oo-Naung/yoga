@@ -9,6 +9,10 @@ const Color white = Colors.white;
 const Color blueGrey = Colors.blueGrey;
 const Color darkYellow = Color(0xFFDEC002);
 
+// email
+
+var email = "";
+
 //padding
 
 const double appPadding = 20.0;
